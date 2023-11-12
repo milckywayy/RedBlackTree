@@ -13,10 +13,11 @@ private:
     Node<K, V> *root;
     int n;
 
-    Node<K, V> *NIL = NULL;
+    Node<K, V> *NIL;
     
 public:
     RedBlackTree() {
+        NIL = new Node<K, V>();
         root = NIL;
         n = 0;
     }
@@ -28,6 +29,9 @@ public:
         // Case when tree is empty
         if (root == NIL) {
             node = new Node<K, V>(key, value);
+            node->setParent(NIL);
+            node->setLeft(NIL);
+            node->setRight(NIL);
             node->setColor(BLACK);
             root = node;
             n++;
@@ -42,6 +46,9 @@ public:
             else if (key < pointer->getKey()) {
                 if (pointer->getLeft() == NIL) {
                     node = new Node<K, V>(key, value);
+                    node->setParent(NIL);
+                    node->setLeft(NIL);
+                    node->setRight(NIL);
                     node->setParent(pointer);
                     pointer->setLeft(node);
                     n++;
@@ -53,6 +60,9 @@ public:
             else {
                 if (pointer->getRight() == NIL) {
                     node = new Node<K, V>(key, value);
+                    node->setParent(NIL);
+                    node->setLeft(NIL);
+                    node->setRight(NIL);
                     node->setParent(pointer);
                     pointer->setRight(node);
                     n++;
@@ -63,15 +73,52 @@ public:
             }
         }
 
-        // Case when node's parent is black 
-        if (isBlack(node->getParent())) {
-            return;
-        }
-
         insertFix(node);
     }
 
     void remove(K key) {
+        Node<K, V> *z = findNode(key);
+        Node<K, V> *y;
+        Node<K, V> *x;
+
+        if (z == NIL) {
+            return; // Node not found
+        }
+
+        if (z->getLeft() == NIL || z->getRight() == NIL) {
+            y = z;
+        }
+        else {
+            y = findSuccessor(z);
+        }
+
+        if (y->getLeft() != NIL) {
+            x = y->getLeft();
+        }
+        else {
+            x = y->getRight();
+        }
+
+        x->setParent(y->getParent());
+
+        if (y->getParent() == NIL) {
+            root = x;
+        }
+        else if (y == y->getParent()->getLeft()) {
+            y->getParent()->setLeft(x);
+        }
+        else {
+            y->getParent()->setRight(x);
+        }
+
+        if (y != z) {
+            z->setKey(y->getKey());
+            z->setValue(y->getValue());
+        }
+
+        if (isBlack(y)) {
+            removeFix(x);
+        }
     }
 
     V get(K key) {
@@ -97,8 +144,10 @@ public:
 
     ~RedBlackTree() {
         if (root != NIL) {
-            delete root;
+            freeNodes(root);
         }
+
+        delete NIL;
     }
 
 private:
@@ -223,6 +272,28 @@ private:
         return pointer;
     }
 
+    Node<K, V>* findSuccessor(Node<K, V>* node) {
+        if (node == NIL) {
+            return NIL;
+        }
+
+        if (node->getRight() != NIL) {
+            Node<K, V>* current = node->getRight();
+            while (current->getLeft() != NIL) {
+                current = current->getLeft();
+            }
+            return current;
+        } 
+        else {
+            Node<K, V>* parentNode = node->getParent();
+            while (parentNode != NIL && node == parentNode->getRight()) {
+                node = parentNode;
+                parentNode = parentNode->getParent();
+            }
+            return parentNode;
+        }
+    }
+
     bool isRed(Node<K, V> *node) {
         if (node == NIL) {
             return false;
@@ -257,6 +328,16 @@ private:
             printHelper(node->getLeft(), indent, false);
             printHelper(node->getRight(), indent, true);
         }
+    }
+
+    void freeNodes(Node<K, V> *node) {
+        if (node == NIL) {
+            return;
+        }
+
+        freeNodes(node->getLeft());
+        freeNodes(node->getRight());
+        delete node;
     }
 };
 

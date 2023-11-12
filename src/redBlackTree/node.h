@@ -19,6 +19,13 @@ private:
     Node<K, V> *right;
 
 public:
+    Node<K, V>() {
+        color = BLACK;
+        parent = NULL;
+        left = NULL;
+        right = NULL;
+    }
+
     Node<K, V>(K key, V value) : key(key), value(value) {
         color = RED;
         parent = NULL;
@@ -50,6 +57,14 @@ public:
         return right;
     }
 
+    void setKey(K key) {
+        this->key = key;
+    }
+
+    void setValue(V value) {
+        this->value = value;
+    }
+
     void setColor(COLOR color) {
         this->color = color;
     }
@@ -67,12 +82,6 @@ public:
     }
 
     ~Node() {
-        if (left != NULL) {
-            delete left;
-        }
-        if (right != NULL) {
-            delete right;
-        }
     }
 };
 
