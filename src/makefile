@@ -1,5 +1,5 @@
-../build/main.exe: main.cpp
-	g++ -o ../build/main.exe main.cpp
+../build/main.exe: main.cpp ./redBlackTree/node.h ./redBlackTree/redBlackTree.h
+	g++ -o ../build/main.exe main.cpp ./redBlackTree/node.h ./redBlackTree/redBlackTree.h
 
 test: ../build/main.exe
 	../build/main.exe
