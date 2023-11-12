@@ -119,6 +119,8 @@ public:
         if (isBlack(y)) {
             removeFix(x);
         }
+
+        delete y;
     }
 
     V get(K key) {
@@ -254,7 +256,77 @@ private:
         root->setColor(BLACK);
     }
 
-    void removeFix(Node<K, V> *node) {
+    void removeFix(Node<K, V> *x) {
+        Node<K, V> *w;
+
+        while (x != root && isBlack(x)) {
+            if (x == x->getParent()->getLeft()) {
+                w = x->getParent()->getRight();
+
+                // Case 1
+                if (isRed(w)) {
+                    w->setColor(BLACK);
+                    x->getParent()->setColor(RED);
+                    rotateLeft(x->getParent());
+                    w = x->getParent()->getRight();
+                }
+
+                // Case 2
+                if (isBlack(w->getLeft()) && isBlack(w->getRight())) {
+                    w->setColor(RED);
+                    x = x->getParent();
+                }
+                else {
+                    // Case 3
+                    if (isBlack(w->getRight())) {
+                        w->setColor(RED);
+                        rotateRight(w);
+                        w = x->getParent()->getRight();
+                    }
+
+                    // Case 4
+                    w->setColor(x->getParent()->getColor());
+                    x->getParent()->setColor(BLACK);
+                    w->getRight()->setColor(BLACK);
+                    rotateLeft(x->getParent());
+                    x = root;
+                }
+            }
+            else {
+                w = x->getParent()->getLeft();
+
+                // Case 1
+                if (isRed(w)) {
+                    w->setColor(BLACK);
+                    x->getParent()->setColor(RED);
+                    rotateRight(x->getParent());
+                    w = x->getParent()->getLeft();
+                }
+
+                // Case 2
+                if (isBlack(w->getLeft()) && isBlack(w->getRight())) {
+                    w->setColor(RED);
+                    x = x->getParent();
+                }
+                else {
+                    // Case 3
+                    if (isBlack(w->getLeft())) {
+                        w->setColor(RED);
+                        rotateLeft(w);
+                        w = x->getParent()->getLeft();
+                    }
+
+                    // Case 4
+                    w->setColor(x->getParent()->getColor());
+                    x->getParent()->setColor(BLACK);
+                    w->getLeft()->setColor(BLACK);
+                    rotateRight(x->getParent());
+                    x = root;
+                }
+            }
+        }
+
+        x->setColor(BLACK);
     }
 
     Node<K, V> *findNode(K key) {
