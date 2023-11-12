@@ -120,6 +120,7 @@ public:
             removeFix(x);
         }
 
+        n--;
         delete y;
     }
 
