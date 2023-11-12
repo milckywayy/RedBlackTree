@@ -74,7 +74,15 @@ public:
     void remove(K key) {
     }
 
-    void get(K key) {
+    V get(K key) {
+        Node<K, V> *node = findNode(key);
+
+        if (node != NIL) {
+            return node->getValue();
+        }
+        else {
+            throw runtime_error("No such key in RBTree.");
+        }
     }
 
     int size () {
